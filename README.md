@@ -1,5 +1,9 @@
 # tagmanager-rails
 
+[![Gem Version](https://badge.fury.io/rb/tagmanager-rails.png)](http://badge.fury.io/rb/tagmanager-rails)
+[![Dependency Status](https://gemnasium.com/tmaier/tagmanager-rails.png)](https://gemnasium.com/tmaier/tagmanager-rails)
+[![Code Climate](https://codeclimate.com/github/tmaier/tagmanager-rails.png)](https://codeclimate.com/github/tmaier/tagmanager-rails)
+
 This gem provides [Tag Manager](https://github.com/max-favilli/tagmanager) for Rails asset pipeline.
 
 It includes the CSS; SCSS and LESS version of the stylesheet.
