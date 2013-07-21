@@ -4,13 +4,14 @@
 [![Dependency Status](https://gemnasium.com/tmaier/tagmanager-rails.png)](https://gemnasium.com/tmaier/tagmanager-rails)
 [![Code Climate](https://codeclimate.com/github/tmaier/tagmanager-rails.png)](https://codeclimate.com/github/tmaier/tagmanager-rails)
 
-This gem provides [Tag Manager](https://github.com/max-favilli/tagmanager) for Rails asset pipeline.
+This gem provides [Tag Manager][] for Rails asset pipeline.
 
 It includes the CSS; SCSS and LESS version of the stylesheet.
 
 ## Version
 
-[3f2dff68105a2adb89513104534082360e25c373](https://github.com/max-favilli/tagmanager/commit/3f2dff68105a2adb89513104534082360e25c373)
+Tag Manager version 2.4.2
+[8d91c8683546409ab9ec459456f12afa1a0a870f](https://github.com/max-favilli/tagmanager/commit/8d91c8683546409ab9ec459456f12afa1a0a870f)
 
 ## Installation
 
@@ -65,7 +66,9 @@ Feel free to open an issue ticket if you find something that could be improved.
 
 ## Acknowledgements
 
-Many thanks to [max-favilli](https://github.com/max-favilli) for [Tag Manager](https://github.com/max-favilli) and all Rails committer for Rails.
+Many thanks to [max-favilli](https://github.com/max-favilli) for [Tag Manager][] and all Rails committer for Rails.
 
 Copyright [Tobias L. Maier](http://tobiasmaier.info), released under the MIT License.
 Tag Manager itself is under Mozilla Public License. See [license.txt](https://github.com/max-favilli/tagmanager/blob/master/license.txt) of the project.
+
+[Tag Manager]: https://github.com/max-favilli/tagmanager
