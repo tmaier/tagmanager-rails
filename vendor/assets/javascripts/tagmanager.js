@@ -1,5 +1,5 @@
 /* ===================================================
- * bootstrap-tagmanager.js v2.4.2
+ * tagmanager.js v3.0.0
  * http://welldonethings.com/tags/manager
  * ===================================================
  * Copyright 2012 Max Favilli
@@ -15,7 +15,7 @@
  * limitations under the License.
  * ========================================================== */
 
-(function($){
+(function ($) {
 
   "use strict";
 
@@ -24,72 +24,69 @@
     console.log = function () { };
   }
 
-  $.fn.tagsManager = function (options,tagToManipulate) {
+  $.fn.tagsManager = function (options, tagToManipulate) {
+    var obj = this;
+    var rndid = "";
+
     var tagManagerOptions = {
       prefilled: null,
       CapitalizeFirstLetter: false,
       preventSubmitOnEnter: true, // deprecated
       isClearInputOnEsc: true, // deprecated
-      typeahead: false,
-      typeaheadAjaxMethod: "POST",
-      typeaheadAjaxSource: null,
-      typeaheadAjaxPolling: false,
-      typeaheadOverrides: null,
-      typeaheadDelegate: {},
-      typeaheadSource: null,
       AjaxPush: null,
       AjaxPushAllTags: null,
       AjaxPushParameters: null,
-      delimiters: [9,13,44], // tab, enter, comma
+      delimiters: [9, 13, 44], // tab, enter, comma
       backspace: [8],
       maxTags: 0,
-      hiddenTagListName: null,
-      hiddenTagListId: null,
+      hiddenTagListName: null,  // deprecated
+      hiddenTagListId: null,  // deprecated
+      replace: true,
+      output: null,
       deleteTagsOnBackspace: true, // deprecated
       tagsContainer: null,
-      tagCloseIcon: '×',
+      tagCloseIcon: 'x',
       tagClass: '',
       validator: null,
       onlyTagList: false
     };
-
-    var TypeaheadOverrides = (function () {
-      function TypeaheadOverrides() {
-        this.instanceSelectHandler = null;
-        this.selectedClass = "selected";
-        this.select = null;
-        if ("typeahead" in $.fn) {
-          this.instanceSelectHandler = $.fn.typeahead.Constructor.prototype.select;
-          this.select = function (overrides) {
-            this.$menu.find(".active").addClass(overrides.selectedClass);
-            overrides.instanceSelectHandler.apply(this, arguments);
-          };
-        }
-      }
-      return TypeaheadOverrides;
-    })();
 
     // exit when no matched elements
     if (!(0 in this)) {
       return this;
     }
 
-    tagManagerOptions.typeaheadOverrides = new TypeaheadOverrides();
-
-    $.extend(tagManagerOptions, options);
-
-    if (tagManagerOptions.hiddenTagListName === null) {
-      tagManagerOptions.hiddenTagListName = "hidden-" + this.attr('name');
+    if (typeof options == 'string') {
+      tagManagerOptions = obj.data("tm_options");
+    } else {
+      $.extend(tagManagerOptions, options);
+      obj.data("tm_options", tagManagerOptions);
     }
 
-    var obj = this;
-    var objName = obj.attr('name').replace(/[^\w]/g, '_');
+    if (typeof options == 'string') {
+      rndid = obj.data("tm_rndid");
+    } else {
+      var albet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+      for (var i = 0; i < 5; i++)
+        rndid += albet.charAt(Math.floor(Math.random() * albet.length));
+      obj.data("tm_rndid", rndid);
+    }
+
+    if (tagManagerOptions.replace === true && tagManagerOptions.hiddenTagListName === null) {
+      var original_name = obj.attr('name');
+      tagManagerOptions.hiddenTagListName = original_name;
+      obj.attr('name', "display-" + rndid);
+    }
+    if (tagManagerOptions.hiddenTagListName === null) {
+      tagManagerOptions.hiddenTagListName = "hidden-" + rndid;
+    }
+
     var delimiters = tagManagerOptions.delimeters || tagManagerOptions.delimiters; // 'delimeter' is deprecated
     // delimiter values to be handled as key codes
-    var keyNums = [9,13,17,18,19,37,38,39,40];
+    var keyNums = [9, 13, 17, 18, 19, 37, 38, 39, 40];
     var delimiterChars = [], delimiterKeys = [];
-    $.each(delimiters, function(i,v){
-      if ( $.inArray(v, keyNums) != -1 ){
+    $.each(delimiters, function (i, v) {
+      if ($.inArray(v, keyNums) != -1) {
         delimiterKeys.push(v);
       } else {
         delimiterChars.push(v);
@@ -102,107 +99,29 @@
 
     if ($.isFunction(tagManagerOptions.validator)) obj.data('validator', tagManagerOptions.validator);
 
-    var setupTypeahead = function () {
-      if (!obj.typeahead) return;
 
-      var taOpts = tagManagerOptions.typeaheadDelegate;
+    //var ajaxPolling = function (query, process) {
+    //  if (typeof (tagManagerOptions.typeaheadAjaxSource) == "string") {
+    //    $.ajax({
+    //      cache: false,
+    //      type: "POST",
+    //      contentType: "application/json",
+    //      dataType: "json",
+    //      url: tagManagerOptions.typeaheadAjaxSource,
+    //      data: JSON.stringify({ typeahead: query }),
+    //      success: function (data) { onTypeaheadAjaxSuccess(data, false, process); }
+    //    });
+    //  }
+    //};
 
-      if (tagManagerOptions.typeaheadSource != null && $.isFunction(tagManagerOptions.typeaheadSource)) {
-        $.extend(taOpts, { source: tagManagerOptions.typeaheadSource });
-        obj.typeahead(taOpts);
-      } else if (tagManagerOptions.typeaheadSource != null) {
-        obj.typeahead(taOpts);
-        setTypeaheadSource(tagManagerOptions.typeaheadSource);
-      } else if (tagManagerOptions.typeaheadAjaxSource != null) {
-        if (!tagManagerOptions.typeaheadAjaxPolling) {
-          obj.typeahead(taOpts);
-
-          if (typeof (tagManagerOptions.typeaheadAjaxSource) == "string") {
-            $.ajax({
-              cache: false,
-              type: tagManagerOptions.typeaheadAjaxMethod,
-              contentType: "application/json",
-              dataType: "json",
-              url: tagManagerOptions.typeaheadAjaxSource,
-              data: JSON.stringify({ typeahead: "" }),
-              success: function (data) { onTypeaheadAjaxSuccess(data, true); }
-            });
-          }
-        } else if (tagManagerOptions.typeaheadAjaxPolling) {
-          $.extend(taOpts, { source: ajaxPolling });
-          obj.typeahead(taOpts);
-        }
-      }
-
-      var data = obj.data('typeahead');
-      if (data) {
-        // set the overrided handler
-        data.select = $.proxy(tagManagerOptions.typeaheadOverrides.select,
-          obj.data('typeahead'),
-          tagManagerOptions.typeaheadOverrides);
-      }
-    };
-
-    var onTypeaheadAjaxSuccess = function(data, isSetTypeaheadSource, process) {
-      // format data if it is an asp.net 3.5 response
-      if ("d" in data) {
-        data = data.d;
-      }
-
-      if (data && data.tags) {
-        var sourceAjaxArray = [];
-        sourceAjaxArray.length = 0;
-        $.each(data.tags, function (key, val) {
-          sourceAjaxArray.push(val.tag);
-          if (isSetTypeaheadSource) {
-            setTypeaheadSource(sourceAjaxArray);
-          }
-        });
-
-        if ($.isFunction(process)) {
-          process(sourceAjaxArray);
-        }
-      }
-    };
-
-    var setTypeaheadSource = function (source) {
-      obj.data('active', true);
-      obj.data('typeahead').source = source;
-      tagManagerOptions.typeaheadSource = source;
-      obj.data('active', false);
-    };
-
-    var typeaheadSelectedItem = function () {
-      var listItemSelector = '.' + tagManagerOptions.typeaheadOverrides.selectedClass;
-      var typeahead_data = obj.data('typeahead');
-      return typeahead_data ? typeahead_data.$menu.find(listItemSelector) : undefined;
-    };
-
-    var typeaheadVisible = function () {
-      return $('.typeahead:visible')[0];
-    };
-
-    var ajaxPolling = function (query, process) {
-      if (typeof (tagManagerOptions.typeaheadAjaxSource) == "string") {
-        $.ajax({
-          cache: false,
-          type: "POST",
-          contentType: "application/json",
-          dataType: "json",
-          url: tagManagerOptions.typeaheadAjaxSource,
-          data: JSON.stringify({ typeahead: query }),
-          success: function (data) { onTypeaheadAjaxSuccess(data, false, process); }
-        });
-      }
-    };
 
     var tagClasses = function () {
       // 1) default class (tm-tag)
       var cl = tagBaseClass;
       // 2) interpolate from input class: tm-input-xxx --> tm-tag-xxx
       if (obj.attr('class')) {
-        $.each(obj.attr('class').split(' '), function(index, value) {
-          if (value.indexOf(inputBaseClass+'-') != -1){
+        $.each(obj.attr('class').split(' '), function (index, value) {
+          if (value.indexOf(inputBaseClass + '-') != -1) {
             cl += ' ' + tagBaseClass + value.substring(inputBaseClass.length);
           }
         });
@@ -222,18 +141,40 @@
       return tag.substring(0, i);
     };
 
+    var showOrHide = function () {
+      var tlis = obj.data("tlis");
+      if (tagManagerOptions.maxTags > 0 && tlis.length < tagManagerOptions.maxTags) {
+        obj.show();
+        obj.trigger('tm:show');
+      }
+      if (tagManagerOptions.maxTags > 0 && tlis.length >= tagManagerOptions.maxTags) {
+        obj.hide();
+        obj.trigger('tm:hide');
+      }
+    };
+
     var popTag = function () {
       var tlis = obj.data("tlis");
       var tlid = obj.data("tlid");
 
       if (tlid.length > 0) {
         var tagId = tlid.pop();
+
+        var tagBeingRemoved = tlis[tlis.length - 1];
+        obj.trigger('tm:popping', tagBeingRemoved);
         tlis.pop();
+
         // console.log("TagIdToRemove: " + tagId);
-        $("#" + objName + "_" + tagId).remove();
+        $("#" + rndid + "_" + tagId).remove();
         refreshHiddenTagList();
+        obj.trigger('tm:popped', tagBeingRemoved);
         // console.log(tlis);
       }
+
+      showOrHide();
+      //if (tagManagerOptions.maxTags > 0 && tlis.length < tagManagerOptions.maxTags) {
+      //  obj.show();
+      //}
     };
 
     var empty = function () {
@@ -244,21 +185,27 @@
         var tagId = tlid.pop();
         tlis.pop();
         // console.log("TagIdToRemove: " + tagId);
-        $("#" + objName + "_" + tagId).remove();
+        $("#" + rndid + "_" + tagId).remove();
         refreshHiddenTagList();
         // console.log(tlis);
       }
+      obj.trigger('tm:emptied', null);
+
+      showOrHide();
+      //if (tagManagerOptions.maxTags > 0 && tlis.length < tagManagerOptions.maxTags) {
+      //  obj.show();
+      //}
     };
 
     var refreshHiddenTagList = function () {
       var tlis = obj.data("tlis");
       var lhiddenTagList = obj.data("lhiddenTagList");
 
-      obj.trigger('tags:refresh', tlis.join(baseDelimiter));
-
       if (lhiddenTagList) {
         $(lhiddenTagList).val(tlis.join(baseDelimiter)).change();
       }
+
+      obj.trigger('tm:refresh', tlis.join(baseDelimiter));
     };
 
     var spliceTag = function (tagId) {
@@ -271,37 +218,40 @@
       // console.log("position: " + p);
 
       if (-1 != p) {
-        $("#" + objName + "_" + tagId).remove();
+        var tagBeingRemoved = tlis[p];
+
+        obj.trigger('tm:splicing', tagBeingRemoved);
+
+        $("#" + rndid + "_" + tagId).remove();
         tlis.splice(p, 1);
         tlid.splice(p, 1);
         refreshHiddenTagList();
+
+        obj.trigger('tm:spliced', tagBeingRemoved);
+
         // console.log(tlis);
       }
 
-      if (tagManagerOptions.maxTags > 0 && tlis.length < tagManagerOptions.maxTags) {
-        obj.show();
-      }
+
+      showOrHide();
+      //if (tagManagerOptions.maxTags > 0 && tlis.length < tagManagerOptions.maxTags) {
+      //  obj.show();
+      //}
     };
 
-    var pushAllTags = function (e, tagstring) {
+    var pushAllTags = function (e, tag) {
       if (tagManagerOptions.AjaxPushAllTags) {
-        $.post(tagManagerOptions.AjaxPush, { tags: tagstring });
+        if (e.type != 'tm:pushed' || $.inArray(tag, tagManagerOptions.prefilled) == -1) {
+          var tlis = obj.data("tlis");
+          $.post(tagManagerOptions.AjaxPush, { tags: tlis.join(baseDelimiter) });
+        }
       }
     };
 
-    var pushTag = function (tag) {
+    var pushTag = function (tag, ignore_events) {
       tag = trimTag(tag);
 
       if (!tag || tag.length <= 0) return;
-
-      if (tagManagerOptions.typeaheadSource != null)
-      {
-          var source = $.isFunction(tagManagerOptions.typeaheadSource) ? 
-                      tagManagerOptions.typeaheadSource() : tagManagerOptions.typeaheadSource;
-                      
-          if(tagManagerOptions.onlyTagList &&
-              $.inArray(tag, source) == -1) return;
-      }
 
       if (tagManagerOptions.CapitalizeFirstLetter && tag.length > 1) {
         tag = tag.charAt(0).toUpperCase() + tag.slice(1).toLowerCase();
@@ -317,7 +267,7 @@
       if (tagManagerOptions.maxTags > 0 && tlis.length >= tagManagerOptions.maxTags) return;
 
       var alreadyInList = false;
-      var tlisLowerCase = tlis.map(function(elem) { return elem.toLowerCase(); });
+      var tlisLowerCase = tlis.map(function (elem) { return elem.toLowerCase(); });
       var p = $.inArray(tag.toLowerCase(), tlisLowerCase);
       if (-1 != p) {
         // console.log("tag:" + tag + " !!already in list!!");
@@ -326,7 +276,7 @@
 
       if (alreadyInList) {
         var pTagId = tlid[p];
-        $("#" + objName + "_" + pTagId).stop()
+        $("#" + rndid + "_" + pTagId).stop()
           .animate({ backgroundColor: tagManagerOptions.blinkBGColor_1 }, 100)
           .animate({ backgroundColor: tagManagerOptions.blinkBGColor_2 }, 100)
           .animate({ backgroundColor: tagManagerOptions.blinkBGColor_1 }, 100)
@@ -334,6 +284,9 @@
           .animate({ backgroundColor: tagManagerOptions.blinkBGColor_1 }, 100)
           .animate({ backgroundColor: tagManagerOptions.blinkBGColor_2 }, 100);
       } else {
+        if(!ignore_events)
+          obj.trigger('tm:pushing', tag);
+
         var max = Math.max.apply(null, tlid);
         max = max == -Infinity ? 0 : max;
 
@@ -341,14 +294,17 @@
         tlis.push(tag);
         tlid.push(tagId);
 
-        if (tagManagerOptions.AjaxPush != null) {
-          $.post(tagManagerOptions.AjaxPush, $.extend({ tag: tag }, tagManagerOptions.AjaxPushParameters));
-        }
+        if (!ignore_events)
+          if (tagManagerOptions.AjaxPush != null) {
+            if ($.inArray(tag, tagManagerOptions.prefilled) == -1) {
+              $.post(tagManagerOptions.AjaxPush, $.extend({ tag: tag }, tagManagerOptions.AjaxPushParameters));
+            }
+          }
 
         // console.log("tagList: " + tlis);
 
-        var newTagId = objName + '_' + tagId;
-        var newTagRemoveId = objName + '_Remover_' + tagId;
+        var newTagId = rndid + '_' + tagId;
+        var newTagRemoveId = rndid + '_Remover_' + tagId;
         var escaped = $("<span></span>").text(tag).html();
 
         var html = '<span class="' + tagClasses() + '" id="' + newTagId + '">';
@@ -360,7 +316,13 @@
         if (tagManagerOptions.tagsContainer != null) {
           $(tagManagerOptions.tagsContainer).append($el);
         } else {
-          obj.before($el);
+          if (tagId > 1) {
+            var lastTagId = tagId - 1;
+            var lastTagObj = $("#" + rndid + "_" + lastTagId);
+            lastTagObj.after($el);
+          } else {
+            obj.before($el);
+          }
         }
 
         $el.find("#" + newTagRemoveId).on("click", obj, function (e) {
@@ -371,16 +333,20 @@
 
         refreshHiddenTagList();
 
-        if (tagManagerOptions.maxTags > 0 && tlis.length >= tagManagerOptions.maxTags) {
-          obj.hide();
-        }
+        if (!ignore_events)
+          obj.trigger('tm:pushed', tag);
+
+        showOrHide();
+        //if (tagManagerOptions.maxTags > 0 && tlis.length >= tagManagerOptions.maxTags) {
+        //  obj.hide();
+        //}
       }
       obj.val("");
     };
 
     var prefill = function (pta) {
       $.each(pta, function (key, val) {
-        pushTag(val);
+        pushTag(val,true);
       });
     };
 
@@ -396,15 +362,12 @@
     };
 
     var applyDelimiter = function (e) {
-      var taItem = typeaheadSelectedItem();
-      var taVisible = typeaheadVisible();
-      if (!(e.which==13 && taItem && taVisible)) {
-        pushTag(obj.val());
-      }
+      pushTag(obj.val());
       e.preventDefault();
     };
 
-    return this.each(function () {
+    var returnValue = null;
+    this.each(function () {
 
       if (typeof options == 'string') {
         switch (options) {
@@ -417,12 +380,15 @@
           case "pushTag":
             pushTag(tagToManipulate);
             break;
+          case "tags":
+            returnValue = { tags: obj.data("tlis") };
+            break;
         }
         return;
       }
 
       // prevent double-initialization of TagManager
-      if ($(this).data('tagManager')){ return false; }
+      if ($(this).data('tagManager')) { return false; }
       $(this).data('tagManager', true);
 
       // store instance-specific data in the DOM object
@@ -431,28 +397,21 @@
       obj.data("tlis", tlis); //list of string tags
       obj.data("tlid", tlid); //list of ID of the string tags
 
-      if (tagManagerOptions.hiddenTagListId == null) { /* if hidden input not given default activity */
-        var hiddenTag = $("input[name='" + tagManagerOptions.hiddenTagListName + "']");
-        if (hiddenTag.length > 0) {
-          hiddenTag.remove();
-        }
-
-        var html = "";
-        html += "<input name='" + tagManagerOptions.hiddenTagListName + "' type='hidden' value=''/>";
-        obj.after(html);
-        obj.data("lhiddenTagList",
-          obj.siblings("input[name='" + tagManagerOptions.hiddenTagListName + "']")[0]
-        );
+      if (tagManagerOptions.output == null) { 
+        var hiddenObj = jQuery('<input/>', {
+          type: 'hidden',
+          name: tagManagerOptions.hiddenTagListName
+        });
+        obj.after(hiddenObj);
+        obj.data("lhiddenTagList", hiddenObj);
       } else {
-        obj.data("lhiddenTagList", $('#' + tagManagerOptions.hiddenTagListId))
-      }
-
-      if (tagManagerOptions.typeahead) {
-        setupTypeahead();
+        obj.data("lhiddenTagList", jQuery(tagManagerOptions.output))
       }
 
       if (tagManagerOptions.AjaxPushAllTags) {
-        obj.on('tags:refresh', pushAllTags);
+        obj.on('tm:spliced', pushAllTags);
+        obj.on('tm:popped', pushAllTags);
+        obj.on('tm:pushed', pushAllTags);
       }
 
       // hide popovers on focus and keypress events
@@ -511,14 +470,6 @@
 
         if (!/webkit/.test(navigator.userAgent.toLowerCase())) { $(this).focus(); } // why?
 
-        var taItem = typeaheadSelectedItem();
-        var taVisible = typeaheadVisible();
-
-        if (taItem && taVisible) {
-          taItem.removeClass(tagManagerOptions.typeaheadOverrides.selectedClass);
-          pushTag(taItem.attr('data-value'));
-          // console.log('change: pushTypeAheadTag ' + tag);
-        }
         /* unimplemented mode to push tag on blur
          else if (tagManagerOptions.pushTagOnBlur) {
          console.log('change: pushTagOnBlur ' + tag);
@@ -535,9 +486,16 @@
         } else if (typeof (tagManagerOptions.prefilled) == "function") {
           prefill(tagManagerOptions.prefilled());
         }
-      } else if (tagManagerOptions.hiddenTagListId != null) {
-        prefill($('#' + tagManagerOptions.hiddenTagListId).val().split(baseDelimiter));
+      } else if (tagManagerOptions.output != null) {
+        if (jQuery(tagManagerOptions.output) && jQuery(tagManagerOptions.output).val())
+        var existing_tags = jQuery(tagManagerOptions.output)
+        prefill(jQuery(tagManagerOptions.output).val().split(baseDelimiter));
       }
     });
+
+    if (!returnValue)
+      returnValue = this;
+
+    return returnValue;
   }
 })(jQuery);
