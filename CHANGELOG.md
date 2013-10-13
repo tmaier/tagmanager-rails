@@ -1,3 +1,12 @@
+## 3.0.0 (2013-10-13)
+
+[Compare changes in gem](https://github.com/tmaier/tagmanager-rails/compare/v0.0.2...v3.0.0)
+|
+[Compare changes in Tag Manager](https://github.com/max-favilli/tagmanager/compare/8d91c8683546409ab9ec459456f12afa1a0a870f...3088482a18c776ed55ff685abedfed28d476b807)
+
+* Update Tag manager version [3088482a18c776ed55ff685abedfed28d476b807][] (Version 3.0.0) (thank you [ianneub][])
+* The version number of `tagmanger-rails` gem follows from now on the version number of tagmanager.
+
 ## 0.0.2 (2013-07-21)
 
 [Compare changes in gem](https://github.com/tmaier/tagmanager-rails/compare/v0.0.1...v0.0.2)
