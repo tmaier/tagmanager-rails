@@ -1,3 +1,9 @@
+## 3.0.0.1 (2013-10-15)
+
+[Compare changes in gem](https://github.com/tmaier/tagmanager-rails/compare/v3.0.0...v3.0.0.1)
+
+* Fix documentation; CSS and JS files to require were renamed from `bootstrap-tagmanager` to `tagmanager`
+
 ## 3.0.0 (2013-10-13)
 
 [Compare changes in gem](https://github.com/tmaier/tagmanager-rails/compare/v0.0.2...v3.0.0)
