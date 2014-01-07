@@ -10,8 +10,8 @@ It includes the CSS; SCSS and LESS version of the stylesheet.
 
 ## Version
 
-Tag Manager version 3.0.0
-[3088482a18c776ed55ff685abedfed28d476b807](https://github.com/max-favilli/tagmanager/commit/3088482a18c776ed55ff685abedfed28d476b807)
+Tag Manager version 3.0.1
+[e71e5e3991cd30a9ad93c3cf879279602e68a85e](https://github.com/max-favilli/tagmanager/commit/e71e5e3991cd30a9ad93c3cf879279602e68a85e)
 
 ## Installation
 

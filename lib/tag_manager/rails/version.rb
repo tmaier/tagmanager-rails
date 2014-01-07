@@ -1,6 +1,6 @@
 module TagManager
   module Rails
-    VERSION = '3.0.0.1'
-    TAGMANAGER_VERSION = '3088482a18c776ed55ff685abedfed28d476b807'
+    VERSION = '3.0.1.0'
+    TAGMANAGER_VERSION = 'e71e5e3991cd30a9ad93c3cf879279602e68a85e'
   end
 end
