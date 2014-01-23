@@ -8,9 +8,10 @@ Gem::Specification.new do |s|
   s.authors     = ['Tobias L. Maier']
   s.email       = ['tobias.maier@baucloud.com']
   s.homepage    = 'https://github.com/tmaier/tagmanager-rails'
-  s.summary     = 'Use Tag Manager with Rails 3'
-  s.description = 'This gem provides Tag Manager for your Rails 3 application.'
-  s.license     = 'MIT'
+  s.summary     = 'Use Tag Manager with Rails 3 & 4'
+  s.description = 'This gem provides Tag Manager for your Rails 3 & 4 application.'
+  s.licenses    = ['MIT', 'MPL-2.0']
+  s.homepage    = 'https://github.com/tmaier/tagmanager-rails'
 
   s.required_rubygems_version = '>= 1.3.6'
 
