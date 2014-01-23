@@ -11,7 +11,6 @@ Gem::Specification.new do |s|
   s.summary     = 'Use Tag Manager with Rails 3 & 4'
   s.description = 'This gem provides Tag Manager for your Rails 3 & 4 application.'
   s.licenses    = ['MIT', 'MPL-2.0']
-  s.homepage    = 'https://github.com/tmaier/tagmanager-rails'
 
   s.required_rubygems_version = '>= 1.3.6'
 
