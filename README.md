@@ -1,8 +1,8 @@
 # tagmanager-rails
 
-[![Gem Version](https://badge.fury.io/rb/tagmanager-rails.png)](http://badge.fury.io/rb/tagmanager-rails)
-[![Dependency Status](https://gemnasium.com/tmaier/tagmanager-rails.png)](https://gemnasium.com/tmaier/tagmanager-rails)
-[![Code Climate](https://codeclimate.com/github/tmaier/tagmanager-rails.png)](https://codeclimate.com/github/tmaier/tagmanager-rails)
+[![Gem Version](https://badge.fury.io/rb/tagmanager-rails.svg)](http://badge.fury.io/rb/tagmanager-rails)
+[![Dependency Status](https://gemnasium.com/tmaier/tagmanager-rails.svg)](https://gemnasium.com/tmaier/tagmanager-rails)
+[![Code Climate](https://codeclimate.com/github/tmaier/tagmanager-rails.svg)](https://codeclimate.com/github/tmaier/tagmanager-rails)
 
 This gem provides [Tag Manager][] for Rails asset pipeline.
 
